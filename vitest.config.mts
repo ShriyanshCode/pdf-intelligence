@@ -14,6 +14,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['tests/**/*.test.ts'],
+    // Forks emit a spurious "kill EPERM" teardown error on Windows after the run
+    // has already reported. Threads avoid it and start faster.
+    pool: 'threads',
   },
   resolve: {
     // Mirrors the "@/*" path alias in tsconfig.json so tests import the same way
