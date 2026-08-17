@@ -1,14 +1,35 @@
+# dependencies
 node_modules/
+.pnp.*
+
+# build output
 .next/
 out/
 build/
+*.tsbuildinfo
+next-env.d.ts
+
+# secrets — .env.example is deliberately NOT ignored so reviewers can see the
+# required keys. Do not broaden this to `.env*` or that file stops being tracked.
 .env
 .env.local
 .env*.local
-.vercel
-*.tsbuildinfo
-next-env.d.ts
+*.pem
+
+# generated at install time by scripts/copy-pdf-worker.mjs
+public/pdf.worker.min.mjs
+
+# test artifacts
 coverage/
 test-results/
 playwright-report/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# platform
+.vercel
 .DS_Store
