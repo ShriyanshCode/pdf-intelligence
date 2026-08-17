@@ -12,7 +12,7 @@
     "test:watch": "vitest",
     "e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:migrate": "tsx --env-file=.env.local scripts/migrate.mts"
   },
   "dependencies": {
     "@google/genai": "^2.17.1",
