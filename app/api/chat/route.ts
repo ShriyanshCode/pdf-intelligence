@@ -137,17 +137,22 @@ export async function POST(req: Request) {
               encoder.encode('The answer stream failed before producing any text. Please try again.'),
             );
           }
-        } finally {
-          controller.close();
-          // Persist only a completed answer, so a broken stream leaves no
-          // half-turn in the history to confuse the next question.
-          if (answer.trim()) {
-            await db
-              .insert(chatMessages)
-              .values({ documentId, sessionKey, role: 'assistant', content: answer })
-              .catch((e) => console.error('failed to persist answer', e));
-          }
         }
+
+        // Persist BEFORE closing the stream. On Vercel the function can be frozen
+        // as soon as the response completes, so an insert queued after
+        // controller.close() may never run — which silently loses conversation
+        // history in production while working fine locally, where the process
+        // keeps living. Only a completed answer is stored, so a broken stream
+        // leaves no half-turn to confuse the next question.
+        if (answer.trim()) {
+          await db
+            .insert(chatMessages)
+            .values({ documentId, sessionKey, role: 'assistant', content: answer })
+            .catch((e) => console.error('failed to persist answer', e));
+        }
+
+        controller.close();
       },
     });
 

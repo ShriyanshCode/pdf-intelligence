@@ -26,16 +26,18 @@ export default async function SharedDocumentPage({
 
   const { document: doc, share } = resolved;
 
-  // Fire and forget: a failed timestamp update must not block the page.
-  void db
-    .update(shares)
-    .set({ lastViewedAt: new Date() })
-    .where(eq(shares.id, share.id))
-    .catch(() => {});
-
+  // Awaited rather than fire-and-forget: on Vercel the function can be frozen once
+  // the response completes, so an un-awaited promise may never run and the
+  // "last viewed" timestamp would silently never update in production. It is
+  // batched with the other reads so it costs no extra wall time, and a failure
+  // still cannot block the page.
   const [fileUrl, commentTree] = await Promise.all([
     createSignedViewUrl(doc.storagePath),
     listComments(doc.id, token),
+    db.update(shares)
+      .set({ lastViewedAt: new Date() })
+      .where(eq(shares.id, share.id))
+      .catch(() => {}),
   ]);
 
   const chatEnabled = doc.status === 'ready' && doc.hasExtractableText !== false;
