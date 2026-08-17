@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import { shares } from '@/lib/db/schema';
 import { resolveShareToken } from '@/lib/authz';
 import { createSignedViewUrl } from '@/lib/storage';
-import { PdfViewer } from '@/components/pdf-viewer';
+import { PdfViewer } from '@/components/pdf-viewer-lazy';
 import { SummaryBanner } from '@/components/summary-banner';
 import { ViewerLayout } from '@/components/viewer-layout';
 import { ChatPanel } from '@/components/chat-panel';
