@@ -9,7 +9,9 @@ import { SummaryBanner } from '@/components/summary-banner';
 import { ViewerLayout } from '@/components/viewer-layout';
 import { ChatPanel } from '@/components/chat-panel';
 import { CommentsPanel } from '@/components/comments-panel';
-import { listComments } from '@/app/(app)/d/[id]/comment-actions';
+// Read through lib/data, not the Server Action: functions exported from a
+// 'use server' module are POST endpoints and cannot be called during render.
+import { listCommentsForViewer } from '@/lib/data/comments';
 
 /** Public: no session required. The token itself is the credential. */
 export default async function SharedDocumentPage({
@@ -33,7 +35,7 @@ export default async function SharedDocumentPage({
   // still cannot block the page.
   const [fileUrl, commentTree] = await Promise.all([
     createSignedViewUrl(doc.storagePath),
-    listComments(doc.id, token),
+    listCommentsForViewer(doc.id, token),
     db.update(shares)
       .set({ lastViewedAt: new Date() })
       .where(eq(shares.id, share.id))

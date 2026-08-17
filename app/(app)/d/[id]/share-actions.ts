@@ -1,6 +1,6 @@
 'use server';
 
-import { and, desc, eq, isNull } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -10,15 +10,21 @@ import { generateShareToken, shareUrlFor } from '@/lib/share-token';
 import { sendShareEmail } from '@/lib/email';
 import { shareSchema } from '@/lib/validation';
 import { normalizeEmail } from '@/lib/password';
+import { listSharesForOwner, type ShareListItem } from '@/lib/data/shares';
 
-export type ShareListItem = {
-  id: string;
-  inviteeName: string;
-  inviteeEmail: string;
-  canComment: boolean;
-  lastViewedAt: Date | null;
-  url: string;
-};
+/**
+ * Every export here is a Server Action (a POST endpoint). Server Components read
+ * through lib/data/shares instead; listShares exists only so the share dialog can
+ * refresh after creating or revoking a link.
+ */
+
+export type { ShareListItem };
+
+export async function listShares(documentId: string): Promise<ShareListItem[]> {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error('Not signed in');
+  return listSharesForOwner(documentId, session.user.id);
+}
 
 export async function createShare(documentId: string, raw: unknown) {
   const session = await auth();
@@ -63,25 +69,4 @@ export async function revokeShare(shareId: string, documentId: string) {
     .where(and(eq(shares.id, shareId), eq(shares.documentId, documentId)));
 
   revalidatePath(`/d/${documentId}`);
-}
-
-export async function listShares(documentId: string): Promise<ShareListItem[]> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error('Not signed in');
-  await requireOwnedDocument(documentId, session.user.id);
-
-  const rows = await db
-    .select()
-    .from(shares)
-    .where(and(eq(shares.documentId, documentId), isNull(shares.revokedAt)))
-    .orderBy(desc(shares.createdAt));
-
-  return rows.map((s) => ({
-    id: s.id,
-    inviteeName: s.inviteeName,
-    inviteeEmail: s.inviteeEmail,
-    canComment: s.canComment,
-    lastViewedAt: s.lastViewedAt,
-    url: shareUrlFor(s.token),
-  }));
 }

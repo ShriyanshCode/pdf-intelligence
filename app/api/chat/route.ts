@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
 import { asc, eq } from 'drizzle-orm';
-import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { chatMessages } from '@/lib/db/schema';
-import {
-  AccessError, assertCanRead, requireOwnedDocument, resolveShareToken, sessionKeyFor,
-  type Viewer,
-} from '@/lib/authz';
+import { assertCanRead, sessionKeyFor } from '@/lib/authz';
+import { resolveDocumentViewer } from '@/lib/data/viewer';
 import { getAi, CHAT_MODEL } from '@/lib/ai/gemini';
 import { CHAT_SYSTEM, chatUser } from '@/lib/ai/prompts';
 import { buildChatContext, trimHistory, type Message } from '@/lib/ai/retrieve';
@@ -15,26 +12,6 @@ import { toErrorResponse } from '@/lib/api-error';
 
 export const maxDuration = 60;
 
-/**
- * Resolves the caller to a Viewer plus its document, for either entry point:
- * a guest holding a share token, or an authenticated owner.
- */
-async function resolveViewer(documentId: string, shareToken?: string) {
-  if (shareToken) {
-    const resolved = await resolveShareToken(shareToken);
-    if (!resolved || resolved.document.id !== documentId) {
-      throw new AccessError(404, 'Not found');
-    }
-    return { viewer: resolved.viewer, doc: resolved.document };
-  }
-
-  const session = await auth();
-  if (!session?.user?.id) throw new AccessError(404, 'Not found');
-  const doc = await requireOwnedDocument(documentId, session.user.id);
-  const viewer: Viewer = { kind: 'owner', userId: session.user.id };
-  return { viewer, doc };
-}
-
 /** Prior turns for this viewer's private thread. */
 export async function GET(req: Request) {
   try {
@@ -42,7 +19,7 @@ export async function GET(req: Request) {
     const documentId = url.searchParams.get('documentId') ?? '';
     const shareToken = url.searchParams.get('shareToken') ?? undefined;
 
-    const { viewer, doc } = await resolveViewer(documentId, shareToken);
+    const { viewer, doc } = await resolveDocumentViewer(documentId, shareToken);
     assertCanRead(viewer, doc);
 
     const rows = await db
@@ -65,7 +42,7 @@ export async function POST(req: Request) {
     }
     const { documentId, question, shareToken } = parsed.data;
 
-    const { viewer, doc } = await resolveViewer(documentId, shareToken);
+    const { viewer, doc } = await resolveDocumentViewer(documentId, shareToken);
     assertCanRead(viewer, doc);
 
     if (doc.hasExtractableText === false) {

@@ -1,62 +1,30 @@
 'use server';
 
-import { asc, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { comments, users } from '@/lib/db/schema';
-import {
-  AccessError, assertCanComment, assertCanRead, requireOwnedDocument, resolveShareToken,
-  type Viewer,
-} from '@/lib/authz';
+import { assertCanComment } from '@/lib/authz';
 import { commentSchema } from '@/lib/validation';
-import { buildCommentTree, type CommentRow } from '@/lib/comments';
+import { resolveDocumentViewer } from '@/lib/data/viewer';
+import { listCommentsForViewer } from '@/lib/data/comments';
+import type { CommentNode } from '@/lib/comments';
 
-/** Resolves the caller to a Viewer plus the document, for either entry point. */
-async function resolveViewer(documentId: string, shareToken?: string) {
-  if (shareToken) {
-    const resolved = await resolveShareToken(shareToken);
-    if (!resolved || resolved.document.id !== documentId) {
-      throw new AccessError(404, 'Not found');
-    }
-    return { viewer: resolved.viewer, doc: resolved.document, share: resolved.share };
-  }
+/**
+ * Every export here is a Server Action (a POST endpoint). Server Components must
+ * therefore read through lib/data/* instead of calling these during render.
+ * listComments exists only so the client panel can refresh after posting.
+ */
 
-  const session = await auth();
-  if (!session?.user?.id) throw new AccessError(404, 'Not found');
-  const doc = await requireOwnedDocument(documentId, session.user.id);
-  const viewer: Viewer = { kind: 'owner', userId: session.user.id };
-  return { viewer, doc, share: null };
-}
-
-export async function listComments(documentId: string, shareToken?: string) {
-  const { viewer, doc } = await resolveViewer(documentId, shareToken);
-  assertCanRead(viewer, doc);
-
-  const rows = await db
-    .select({
-      id: comments.id, parentId: comments.parentId, body: comments.body,
-      authorLabel: comments.authorLabel, authorUserId: comments.authorUserId,
-      createdAt: comments.createdAt,
-    })
-    .from(comments)
-    .where(eq(comments.documentId, documentId))
-    .orderBy(asc(comments.createdAt));
-
-  const shaped: CommentRow[] = rows.map((r) => ({
-    id: r.id,
-    parentId: r.parentId,
-    body: r.body,
-    authorLabel: r.authorLabel,
-    isOwner: r.authorUserId !== null,
-    createdAt: r.createdAt,
-  }));
-
-  return buildCommentTree(shaped);
+export async function listComments(
+  documentId: string,
+  shareToken?: string,
+): Promise<CommentNode[]> {
+  return listCommentsForViewer(documentId, shareToken);
 }
 
 export async function addComment(documentId: string, raw: unknown, shareToken?: string) {
-  const { viewer, doc, share } = await resolveViewer(documentId, shareToken);
+  const { viewer, doc, share } = await resolveDocumentViewer(documentId, shareToken);
   assertCanComment(viewer, doc);
 
   const parsed = commentSchema.safeParse(raw);
