@@ -2892,7 +2892,16 @@ git commit -m "feat: add dashboard with live document status and filename search
 **Interfaces:**
 - Consumes: `embedQuery`, `db`, `chunks`, `documents`.
 - Produces:
-  - `SIMILARITY_FLOOR = 0.35`, `MAX_CHUNK_HITS = 60`
+  - `SIMILARITY_FLOOR = 0.6`, `MAX_CHUNK_HITS = 60`
+
+**Calibrated against the live API in Task 9, correcting this plan's original 0.35.**
+`gemini-embedding-001` similarities occupy a compressed high range: a measured
+query/document pair scored 0.69 when genuinely related and **0.503 when
+completely unrelated** ("employment contract" vs a cake recipe). A 0.35 floor
+would therefore admit every document for every query. Start at 0.6 and confirm
+against real uploads in Step 5 — if relevant documents are being excluded, lower
+it in 0.05 steps rather than reverting to 0.35. Note this floor applies only to
+dashboard search; chat retrieval takes top-k unconditionally and needs no floor.
   - `type ChunkHit = { documentId, filename, summary, status, error, pageCount, sizeBytes, hasExtractableText, createdAt, updatedAt, shareCount, idx, content, similarity }`
   - `groupHitsByDocument(hits: ChunkHit[]): CardDocument[]`
   - `snippetFor(content: string, maxChars?: number): string`
