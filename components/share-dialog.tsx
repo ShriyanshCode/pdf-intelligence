@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Check, Copy, Share2, X } from 'lucide-react';
+import { formatDate } from '@/lib/format';
 import {
   createShare, revokeShare, listShares, type ShareListItem,
 } from '@/app/(app)/d/[id]/share-actions';
@@ -151,7 +152,7 @@ export function ShareDialog({
                         <p className="truncate text-xs text-neutral-500">
                           {share.inviteeEmail}
                           {share.lastViewedAt
-                            ? ` · viewed ${new Date(share.lastViewedAt).toLocaleDateString()}`
+                            ? ` · viewed ${formatDate(share.lastViewedAt)}`
                             : ' · not opened yet'}
                           {!share.canComment ? ' · read only' : ''}
                         </p>

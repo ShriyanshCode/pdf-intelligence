@@ -33,3 +33,6 @@ yarn-error.log*
 # platform
 .vercel
 .DS_Store
+
+# playwright MCP scratch (snapshots, console logs, ad-hoc fixtures)
+.playwright-mcp/

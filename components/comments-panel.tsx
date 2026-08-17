@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Markdown } from '@/components/markdown';
+import { formatDateTime } from '@/lib/format';
 import { CommentComposer } from '@/components/comment-composer';
 import { addComment, listComments } from '@/app/(app)/d/[id]/comment-actions';
 import type { CommentNode, CommentRow } from '@/lib/comments';
@@ -10,7 +11,7 @@ function Meta({ comment }: { comment: CommentRow }) {
   return (
     <p className="text-xs text-neutral-500">
       <span className="font-medium text-neutral-700">{comment.authorLabel}</span>
-      {comment.isOwner ? ' · owner' : ''} · {new Date(comment.createdAt).toLocaleString()}
+      {comment.isOwner ? ' · owner' : ''} · {formatDateTime(comment.createdAt)}
     </p>
   );
 }
