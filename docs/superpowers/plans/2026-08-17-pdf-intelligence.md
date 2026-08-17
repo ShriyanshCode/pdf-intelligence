@@ -21,7 +21,12 @@ Every task's requirements implicitly include this section.
 - **`next-auth` pinned to exactly `5.0.0-beta.32`** — no caret. Auth.js v5 is still prerelease and betas break between releases. If it fights Next 16 during Task 4, the documented fallback is a ~100-line `jose` session layer (spec §2, approach A3); do not spend more than one hour fighting it.
 - **Tailwind CSS v4** — CSS-first config via `@import "tailwindcss"` in `app/globals.css` and `@tailwindcss/postcss` in `postcss.config.mjs`. There is **no `tailwind.config.js`**. Do not create one.
 - **Emails are stored as `text`, lowercased and trimmed at every write.** The spec says `citext`; we use `text` + a unique index instead to avoid depending on a Postgres extension and because Drizzle types it natively. Normalization belongs in `lib/auth.ts`, not scattered across callers.
-- **Postgres driver is `postgres` (postgres.js) with `{ prepare: false }`.** Required for Supabase's Supavisor pooler in transaction mode. Use the **pooled** connection string (port 6543), not the direct one, or serverless functions will exhaust connections.
+- **Postgres driver is `postgres` (postgres.js) with `{ prepare: false }`.** Required for Supabase's Supavisor pooler in transaction mode.
+- **Two connection strings, and they are not interchangeable:**
+  - `DATABASE_URL` → **Transaction pooler, port 6543**. Used by the app at runtime. Serverless functions must use this or they exhaust connections. Transaction mode does not support prepared statements, which is why `prepare: false` above is mandatory rather than an optimization.
+  - `DIRECT_URL` → **Session pooler, port 5432**. Used *only* by `drizzle-kit`. Schema DDL (`CREATE EXTENSION`, `CREATE INDEX`) needs a real session and fails confusingly through the transaction pooler.
+  - Do **not** use Supabase's "Direct connection": it is IPv6-only without the paid IPv4 add-on and will simply hang. Session pooler is the IPv4-compatible equivalent.
+  - Both strings ship with a literal `[YOUR-PASSWORD]` placeholder. Substitute the real password and URL-encode any `@ : / ?` characters in it.
 - **Embedding dimensions: exactly 768.** `gemini-embedding-001` defaults to 3072; we pass `outputDimensionality: 768` because pgvector's HNSW index caps at 2000 dims. **Truncated vectors are not normalized by the API — we must L2-normalize them ourselves** or cosine distance is wrong.
 - **`pdfjs-dist` worker pinned to 5.4.296**, the exact version bundled by `react-pdf@10.4.1`. A version mismatch renders a blank page. The worker is copied into `public/` by a postinstall script; never load it from a CDN.
 - **Secrets:** `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `RESEND_API_KEY`, `AUTH_SECRET`, `DATABASE_URL` are server-only. No secret may appear in any file under `app/` that carries `'use client'`, and none may be prefixed `NEXT_PUBLIC_`. `.env.local` is gitignored; `.env.example` is committed with empty values.
@@ -221,12 +226,21 @@ Run: `npm run dev` → open `http://localhost:3000` → expect the default page 
 Create `.env.example` (committed, all values empty):
 
 ```
+# Supabase → Connect → ORM (Drizzle). Transaction pooler, port 6543. Runtime.
 DATABASE_URL=
+# Same dialog, Session pooler, port 5432. Used only by drizzle-kit for DDL.
+DIRECT_URL=
+# Supabase → Settings → Data API → Project URL
 SUPABASE_URL=
+# Supabase → Settings → API Keys → service_role (the secret key, NOT anon)
 SUPABASE_SERVICE_ROLE_KEY=
+# aistudio.google.com → Get API key
 GEMINI_API_KEY=
+# Generate with: npx auth secret
 AUTH_SECRET=
+# resend.com → API Keys. Optional; sharing still works without it.
 RESEND_API_KEY=
+# Must be the deployed origin in production, or emailed share links point at localhost.
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
@@ -257,7 +271,17 @@ In the Supabase dashboard: create a project, then SQL Editor → run:
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
-Copy the **pooled** connection string (Connect → Transaction pooler, port 6543) into `.env.local` as `DATABASE_URL`, plus `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from Project Settings → API.
+Now collect four values into `.env.local`. They come from two different screens:
+
+From **Connect** (top of the dashboard) → the **ORM** tab, Drizzle:
+- `DATABASE_URL` — the **Transaction pooler** string, port **6543**
+- `DIRECT_URL` — the **Session pooler** string, port **5432**
+
+From **Settings**:
+- `SUPABASE_URL` — Settings → Data API → Project URL
+- `SUPABASE_SERVICE_ROLE_KEY` — Settings → API Keys → `service_role`. Not the `anon` key; the server needs service-role precisely because we are not using RLS.
+
+Replace the literal `[YOUR-PASSWORD]` in both connection strings with your database password, URL-encoding any `@ : / ?` in it. Verify the ports differ between the two — if both read 6543, you copied the same string twice and `db:push` will fail on `CREATE INDEX`.
 
 Create a **private** storage bucket named `pdfs` (Storage → New bucket → Public: off).
 
@@ -388,7 +412,8 @@ export default defineConfig({
   schema: './lib/db/schema.ts',
   out: './drizzle',
   dialect: 'postgresql',
-  dbCredentials: { url: process.env.DATABASE_URL! },
+  // Session pooler, not the transaction pooler: DDL needs a real session.
+  dbCredentials: { url: process.env.DIRECT_URL ?? process.env.DATABASE_URL! },
 });
 ```
 
@@ -5232,7 +5257,9 @@ Expected: `.env.local` appears nowhere; only `.env.example` is tracked.
 
 Import the repo at vercel.com. Set every variable from `.env.example` in Project Settings → Environment Variables, for Production **and** Preview:
 
-`DATABASE_URL` (the pooled Supabase string, port 6543), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `AUTH_SECRET`, `RESEND_API_KEY`, and `NEXT_PUBLIC_APP_URL` set to the real Vercel URL.
+`DATABASE_URL` (**transaction pooler, port 6543** — not the session pooler; serverless functions need transaction mode), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `AUTH_SECRET`, `RESEND_API_KEY`, and `NEXT_PUBLIC_APP_URL` set to the real Vercel URL.
+
+`DIRECT_URL` is **not** needed on Vercel — it exists only so `drizzle-kit` can run DDL from your machine. Leaving it out of Vercel is correct, not an omission.
 
 `NEXT_PUBLIC_APP_URL` must be the deployed origin, or emailed share links will point at localhost.
 

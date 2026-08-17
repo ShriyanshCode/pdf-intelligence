@@ -365,7 +365,8 @@ browser context → comment as the guest → assert the owner sees the comment.
 ## 11. Environment variables
 
 ```
-DATABASE_URL                  Supabase Postgres connection string (pooled)
+DATABASE_URL                  Supabase transaction pooler, port 6543 (runtime)
+DIRECT_URL                    Supabase session pooler, port 5432 (drizzle-kit DDL only)
 SUPABASE_URL                  Supabase project URL
 SUPABASE_SERVICE_ROLE_KEY     server-only, never sent to the client
 GEMINI_API_KEY                server-only
@@ -373,6 +374,14 @@ AUTH_SECRET                   Auth.js session signing
 RESEND_API_KEY                server-only
 NEXT_PUBLIC_APP_URL           used to build share links in emails
 ```
+
+The two connection strings are not interchangeable. Runtime queries go through
+the transaction pooler because serverless functions would otherwise exhaust
+connections; transaction mode forbids prepared statements, hence
+`{ prepare: false }` on the client. Schema DDL goes through the session pooler
+because `CREATE EXTENSION` and `CREATE INDEX` need a real session.
+Supabase's "Direct connection" is IPv6-only without the paid IPv4 add-on and is
+not used.
 
 Every variable except `NEXT_PUBLIC_APP_URL` is server-only. A `.env.example`
 with these keys and empty values is committed; `.env.local` is gitignored.
