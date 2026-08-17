@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hashPassword, verifyPassword, normalizeEmail } from '@/lib/auth';
+import { hashPassword, verifyPassword, normalizeEmail } from '@/lib/password';
 
 describe('password hashing', () => {
   it('never returns the plaintext', async () => {
