@@ -22,7 +22,7 @@ account, and collaborate through threaded comments.
 | 6 | AI summary | Generated on upload, shown on the dashboard card and at the top of the viewer. |
 | 7 | AI chat | Grounded, cites page numbers, keeps the last 5 turns of context, streams token-by-token. |
 | 8 | Security and privacy | Access control in one module, private storage bucket with signed URLs, no secrets client-side. |
-| 9 | UI and design | Responsive; desktop splits PDF and panel, mobile switches panes from a bottom bar. Light-only "chocolate truffle" theme (see below). |
+| 9 | UI and design | Responsive; desktop splits PDF and panel, mobile switches panes from a bottom bar. Light-only theme, cool ground with warm accents (see below). |
 
 ### Theme
 
