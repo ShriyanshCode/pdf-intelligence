@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { AccessError, requireOwnedDocument } from '@/lib/authz';
@@ -36,7 +38,16 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex shrink-0 items-center justify-end border-b bg-surface px-4 py-2 sm:px-6">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b bg-surface px-4 py-2 sm:px-6">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-sm text-ink/80 transition hover:border-clay hover:text-ink"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          {/* The full label would crowd the Share button on a phone. */}
+          <span className="sm:hidden">Back</span>
+          <span className="hidden sm:inline">Back to dashboard</span>
+        </Link>
         <ShareDialog documentId={doc.id} initialShares={shareRows} />
       </div>
 
