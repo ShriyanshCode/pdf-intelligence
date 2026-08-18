@@ -10,8 +10,6 @@ account, and collaborate through threaded comments.
 
 ## Features
 
-### Must-haves
-
 | # | Feature | Notes |
 |---|---|---|
 | 1 | Signup and authentication | Name, email, password. `bcrypt` cost 12, hashed in our own code (`lib/password.ts`). Auth.js JWT session cookies. |
@@ -24,42 +22,6 @@ account, and collaborate through threaded comments.
 | 8 | Security and privacy | Access control in one module, private storage bucket with signed URLs, no secrets client-side. |
 | 9 | UI and design | Responsive; desktop splits PDF and panel, mobile switches panes from a bottom bar. Light-only theme, cool ground with warm accents (see below). |
 
-### Theme
-
-Cool light ground, warm accents. Defined once as Tailwind v4 tokens in
-`app/globals.css`:
-
-| Token | Hex | Role |
-|---|---|---|
-| `canvas` | `#EBEFEE` | Page background |
-| `surface` | `#FFFFFF` | Cards and panels, lifted off the canvas |
-| `mist` | `#DFE5E3` | Inset fills: chat bubbles, PDF backdrop, skeletons |
-| `line` | `#CCB499` | Borders — warm hairlines against the cool ground |
-| `ink` | `#4A413C` | Body text, headings, primary buttons |
-| `clay` | `#BB6C43` | Accents: focus rings, active tab, icons |
-| `clay-deep` | `#8E5B40` | Links and button hover |
-| `tan` | `#C8906D` | Decorative fills |
-
-**Contrast was measured, not assumed, and it changed the design.** Ink is 8.6:1
-on the canvas — comfortably AA. But `clay` is only **3.5:1**, which passes for
-non-text UI and large text yet fails the 4.5:1 body-copy threshold, and white on
-`clay` is **4.0:1** — also short. So clay is never a button background and never
-carries paragraph text; it appears as focus rings, the active tab underline, and
-icons. Buttons are `ink` (white on ink is 9.9:1) hovering to `clay-deep` (5.6:1).
-
-`clay-deep` exists precisely because `clay` cannot legally carry link text: it is
-that hue mixed toward ink until it passes at 4.9:1. One warm red (`#A11B0F`) is
-added for errors, since the palette has no hue that reads as "wrong" rather than
-merely "warm", and white is used for card surfaces.
-
-Modern treatment: pill buttons and inputs, `rounded-2xl`/`rounded-3xl` cards, and
-soft warm-tinted elevation (`--shadow-card`, `--shadow-float`) rather than flat
-grey shadow.
-
-The app is **light-only**. The `prefers-color-scheme: dark` block from the Next
-template was removed and `color-scheme: light` is declared, so browser-rendered UI
-is not auto-darkened for visitors whose OS is in dark mode.
-
 ### Good-to-haves included
 
 - **Streaming AI responses** — answers render token-by-token as they arrive.
@@ -69,6 +31,20 @@ is not auto-darkened for visitors whose OS is in dark mode.
 - **Email notification on share** via Resend (optional; sharing works without it).
 - **Password reset / account recovery** — see below.
 
+## Stack
+
+| Layer | Choice | Why |
+|---|---|---|
+| Front + back | Next.js 16 (App Router) on Vercel | One repo, one deploy, one URL. No CORS, and native response streaming for chat. |
+| Database | Supabase Postgres + `pgvector` | Free tier that does not expire, and vector search without a second service. |
+| File storage | Supabase Storage (private bucket) | Signed URLs give per-request access control. |
+| Query layer | Drizzle ORM + `postgres.js` | Typed, small cold start, speaks `pgvector` without fighting the ORM. |
+| Auth | Auth.js v5 (Credentials) + `bcryptjs` | Correct cookie/CSRF handling, but hashing stays in our code. |
+| AI | Google Gemini | `gemini-2.5-flash` for summaries and chat, `gemini-embedding-001` for vectors. Genuinely free tier. |
+| Email | Resend | Optional share notifications. |
+| Tests | Vitest | 64 unit tests over the logic where bugs are silent. |
+
+---
 ### Password reset
 
 `/forgot-password` → emailed link → `/reset-password`. Four properties worth
@@ -95,23 +71,6 @@ the Resend account.
 
 ---
 
-## Stack
-
-| Layer | Choice | Why |
-|---|---|---|
-| Front + back | Next.js 16 (App Router) on Vercel | One repo, one deploy, one URL. No CORS, and native response streaming for chat. |
-| Database | Supabase Postgres + `pgvector` | Free tier that does not expire, and vector search without a second service. |
-| File storage | Supabase Storage (private bucket) | Signed URLs give per-request access control. |
-| Query layer | Drizzle ORM + `postgres.js` | Typed, small cold start, speaks `pgvector` without fighting the ORM. |
-| Auth | Auth.js v5 (Credentials) + `bcryptjs` | Correct cookie/CSRF handling, but hashing stays in our code. |
-| AI | Google Gemini | `gemini-2.5-flash` for summaries and chat, `gemini-embedding-001` for vectors. Genuinely free tier. |
-| Email | Resend | Optional share notifications. |
-| Tests | Vitest | 64 unit tests over the logic where bugs are silent. |
-
-Render credits were deliberately left unspent: Vercel's free tier covers the whole
-app, and a free Supabase database outlives promotional credit.
-
----
 
 ## Running locally
 
