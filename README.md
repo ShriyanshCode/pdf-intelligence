@@ -4,7 +4,7 @@ Upload PDFs, get an AI-generated summary automatically, ask grounded questions
 about the content in a streaming chat, share documents with people who have no
 account, and collaborate through threaded comments.
 
-**Live app:** _(add the Vercel URL here after deploying)_
+**Live app:** _https://pdf-intelligence-theta.vercel.app/_
 
 ---
 
