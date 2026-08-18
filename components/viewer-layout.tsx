@@ -24,7 +24,7 @@ export function ViewerLayout({
     <>
       <div className="hidden min-h-0 flex-1 lg:flex">
         <div className="min-h-0 w-3/5">{pdf}</div>
-        <div className="flex min-h-0 w-2/5 flex-col border-l">
+        <div className="flex min-h-0 w-2/5 flex-col border-l bg-cream">
           <div className="flex shrink-0 border-b" role="tablist">
             {(['chat', 'comments'] as const).map((tab) => (
               <button
@@ -34,8 +34,8 @@ export function ViewerLayout({
                 onClick={() => setDesktopTab(tab)}
                 className={`flex-1 px-4 py-2.5 text-sm transition ${
                   desktopTab === tab
-                    ? 'border-b-2 border-neutral-900 font-medium'
-                    : 'text-neutral-500 hover:text-neutral-800'
+                    ? 'border-b-2 border-ember font-medium'
+                    : 'text-bark/80 hover:text-cocoa'
                 }`}
               >
                 {tab === 'chat' ? 'AI chat' : 'Comments'}
@@ -50,7 +50,7 @@ export function ViewerLayout({
         <div className="min-h-0 flex-1">
           {mobileTab === 'pdf' ? pdf : mobileTab === 'chat' ? chat : comments}
         </div>
-        <nav className="flex shrink-0 border-t" aria-label="View">
+        <nav className="flex shrink-0 border-t bg-cream" aria-label="View">
           {(
             [
               ['pdf', 'PDF', FileText],
@@ -63,7 +63,7 @@ export function ViewerLayout({
               onClick={() => setMobileTab(key)}
               aria-current={mobileTab === key}
               className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-xs ${
-                mobileTab === key ? 'font-medium text-neutral-900' : 'text-neutral-500'
+                mobileTab === key ? 'font-medium text-cocoa' : 'text-bark/80'
               }`}
             >
               <Icon className="size-4" aria-hidden />

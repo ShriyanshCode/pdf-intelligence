@@ -62,19 +62,19 @@ export function ShareDialog({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm hover:bg-neutral-50"
+        className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm hover:bg-sand"
       >
         <Share2 className="size-4" aria-hidden /> Share
       </button>
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-cocoa/50 p-4"
           onClick={() => setOpen(false)}
           role="presentation"
         >
           <div
-            className="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-lg bg-white p-5 shadow-xl"
+            className="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-lg bg-cream p-5 shadow-xl"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -86,7 +86,7 @@ export function ShareDialog({
                 <X className="size-4" />
               </button>
             </div>
-            <p className="mt-1 text-sm text-neutral-600">
+            <p className="mt-1 text-sm text-bark">
               The invitee gets a private link. They do not need an account.
             </p>
 
@@ -94,12 +94,12 @@ export function ShareDialog({
               <input
                 value={name} onChange={(e) => setName(e.target.value)} required maxLength={100}
                 placeholder="Their name" aria-label="Invitee name"
-                className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-line px-3 py-2 text-sm"
               />
               <input
                 value={email} onChange={(e) => setEmail(e.target.value)} required type="email"
                 placeholder="their@email.com" aria-label="Invitee email"
-                className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-line px-3 py-2 text-sm"
               />
               <label className="flex items-center gap-2 text-sm">
                 <input
@@ -109,18 +109,18 @@ export function ShareDialog({
                 Allow them to comment
               </label>
 
-              {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+              {error && <p role="alert" className="text-sm text-error">{error}</p>}
 
               <button
                 type="submit" disabled={busy}
-                className="w-full rounded-md bg-neutral-900 px-4 py-2 text-sm text-white disabled:opacity-50"
+                className="w-full rounded-md bg-bark px-4 py-2 text-sm text-cream disabled:opacity-50"
               >
                 {busy ? 'Creating…' : 'Create link and email it'}
               </button>
             </form>
 
             {lastUrl && (
-              <div className="mt-3 rounded-md bg-green-50 p-2">
+              <div className="mt-3 rounded-md bg-sand p-2">
                 <div className="flex items-center gap-2">
                   <input
                     readOnly value={lastUrl} aria-label="Share link"
@@ -132,7 +132,7 @@ export function ShareDialog({
                   </button>
                 </div>
                 {emailed === false && (
-                  <p className="mt-1 text-xs text-green-900">
+                  <p className="mt-1 text-xs text-bark">
                     Link created. Email was not sent — copy the link and send it yourself.
                   </p>
                 )}
@@ -141,7 +141,7 @@ export function ShareDialog({
 
             {rows.length > 0 && (
               <div className="mt-4 border-t pt-3">
-                <h3 className="text-xs font-medium uppercase tracking-wide text-neutral-500">
+                <h3 className="text-xs font-medium uppercase tracking-wide text-bark/80">
                   Shared with
                 </h3>
                 <ul className="mt-2 space-y-2">
@@ -149,7 +149,7 @@ export function ShareDialog({
                     <li key={share.id} className="flex items-center justify-between gap-2 text-sm">
                       <div className="min-w-0">
                         <p className="truncate">{share.inviteeName}</p>
-                        <p className="truncate text-xs text-neutral-500">
+                        <p className="truncate text-xs text-bark/80">
                           {share.inviteeEmail}
                           {share.lastViewedAt
                             ? ` · viewed ${formatDate(share.lastViewedAt)}`
@@ -166,7 +166,7 @@ export function ShareDialog({
                             await revokeShare(share.id, documentId);
                             setRows(await listShares(documentId));
                           }}
-                          className="text-xs text-red-700 underline"
+                          className="text-xs text-error underline"
                         >
                           Revoke
                         </button>

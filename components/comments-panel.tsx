@@ -9,8 +9,8 @@ import type { CommentNode, CommentRow } from '@/lib/comments';
 
 function Meta({ comment }: { comment: CommentRow }) {
   return (
-    <p className="text-xs text-neutral-500">
-      <span className="font-medium text-neutral-700">{comment.authorLabel}</span>
+    <p className="text-xs text-bark/80">
+      <span className="font-medium text-cocoa">{comment.authorLabel}</span>
       {comment.isOwner ? ' · owner' : ''} · {formatDateTime(comment.createdAt)}
     </p>
   );
@@ -44,7 +44,7 @@ export function CommentsPanel({
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
-        {tree.length === 0 && <p className="text-sm text-neutral-500">No comments yet.</p>}
+        {tree.length === 0 && <p className="text-sm text-bark/80">No comments yet.</p>}
 
         {tree.map((comment) => (
           <div key={comment.id} className="space-y-2">
@@ -54,7 +54,7 @@ export function CommentsPanel({
               {canComment && (
                 <button
                   onClick={() => setReplyTo(replyTo === comment.id ? null : comment.id)}
-                  className="mt-1 text-xs text-neutral-600 underline"
+                  className="mt-1 text-xs text-bark underline"
                 >
                   {replyTo === comment.id ? 'Cancel' : 'Reply'}
                 </button>
@@ -62,7 +62,7 @@ export function CommentsPanel({
             </div>
 
             {comment.replies.length > 0 && (
-              <div className="space-y-3 border-l-2 border-neutral-200 pl-3">
+              <div className="space-y-3 border-l-2 border-line pl-3">
                 {comment.replies.map((reply) => (
                   <div key={reply.id}>
                     <Meta comment={reply} />
@@ -73,7 +73,7 @@ export function CommentsPanel({
             )}
 
             {replyTo === comment.id && (
-              <div className="border-l-2 border-neutral-200 pl-3">
+              <div className="border-l-2 border-line pl-3">
                 <CommentComposer
                   compact
                   placeholder="Write a reply…"
@@ -89,7 +89,7 @@ export function CommentsPanel({
         {canComment ? (
           <CommentComposer onSubmit={(body) => post(body, null)} />
         ) : (
-          <p className="text-sm text-neutral-500">This link is read-only.</p>
+          <p className="text-sm text-bark/80">This link is read-only.</p>
         )}
       </div>
     </div>

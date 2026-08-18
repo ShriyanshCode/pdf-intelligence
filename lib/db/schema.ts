@@ -21,6 +21,26 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [uniqueIndex('users_email_key').on(t.email)]);
 
+/**
+ * Single-use password reset tokens.
+ *
+ * Only a SHA-256 hash of the token is stored, never the token itself, so read
+ * access to this table cannot be turned into account takeover. SHA-256 rather
+ * than bcrypt is correct here: the token is 256 bits of randomness, so there is
+ * nothing to brute-force, and lookup needs to be deterministic.
+ */
+export const passwordResetTokens = pgTable('password_reset_tokens', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  tokenHash: text('token_hash').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  usedAt: timestamp('used_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex('password_reset_token_hash_key').on(t.tokenHash),
+  index('password_reset_user_idx').on(t.userId),
+]);
+
 export const documents = pgTable('documents', {
   id: uuid('id').primaryKey().defaultRandom(),
   ownerId: uuid('owner_id').notNull().references(() => users.id, { onDelete: 'cascade' }),

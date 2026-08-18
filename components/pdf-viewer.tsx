@@ -19,13 +19,13 @@ export function PdfViewer({ fileUrl }: { fileUrl: string }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b bg-neutral-50 px-3 py-2 text-sm">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b bg-cream px-3 py-2 text-sm">
         <div className="flex items-center gap-1">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
             aria-label="Previous page"
-            className="rounded p-1 hover:bg-neutral-200 disabled:opacity-40"
+            className="rounded p-1 hover:bg-line disabled:opacity-40"
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -34,7 +34,7 @@ export function PdfViewer({ fileUrl }: { fileUrl: string }) {
             onClick={() => setPage((p) => Math.min(numPages, p + 1))}
             disabled={page >= numPages}
             aria-label="Next page"
-            className="rounded p-1 hover:bg-neutral-200 disabled:opacity-40"
+            className="rounded p-1 hover:bg-line disabled:opacity-40"
           >
             <ChevronRight className="size-4" />
           </button>
@@ -44,7 +44,7 @@ export function PdfViewer({ fileUrl }: { fileUrl: string }) {
           <button
             onClick={() => setScale((s) => Math.max(0.5, s - 0.2))}
             aria-label="Zoom out"
-            className="rounded p-1 hover:bg-neutral-200"
+            className="rounded p-1 hover:bg-line"
           >
             <ZoomOut className="size-4" />
           </button>
@@ -52,22 +52,22 @@ export function PdfViewer({ fileUrl }: { fileUrl: string }) {
           <button
             onClick={() => setScale((s) => Math.min(2.5, s + 0.2))}
             aria-label="Zoom in"
-            className="rounded p-1 hover:bg-neutral-200"
+            className="rounded p-1 hover:bg-line"
           >
             <ZoomIn className="size-4" />
           </button>
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto bg-neutral-100 p-4">
+      <div className="min-h-0 flex-1 overflow-auto bg-sand p-4">
         {error ? (
-          <p role="alert" className="text-center text-sm text-red-700">{error}</p>
+          <p role="alert" className="text-center text-sm text-error">{error}</p>
         ) : (
           <Document
             file={fileUrl}
             onLoadSuccess={({ numPages: n }) => { setNumPages(n); setError(null); }}
             onLoadError={(e) => setError(`Could not load this PDF: ${e.message}`)}
-            loading={<p className="text-center text-sm text-neutral-500">Loading PDF…</p>}
+            loading={<p className="text-center text-sm text-bark/80">Loading PDF…</p>}
             className="flex justify-center"
           >
             <Page

@@ -22,7 +22,34 @@ account, and collaborate through threaded comments.
 | 6 | AI summary | Generated on upload, shown on the dashboard card and at the top of the viewer. |
 | 7 | AI chat | Grounded, cites page numbers, keeps the last 5 turns of context, streams token-by-token. |
 | 8 | Security and privacy | Access control in one module, private storage bucket with signed URLs, no secrets client-side. |
-| 9 | UI and design | Responsive; desktop splits PDF and panel, mobile switches panes from a bottom bar. |
+| 9 | UI and design | Responsive; desktop splits PDF and panel, mobile switches panes from a bottom bar. Light-only "chocolate truffle" theme (see below). |
+
+### Theme
+
+A four-colour palette, cream-dominant, defined once as Tailwind v4 tokens in
+`app/globals.css`:
+
+| Token | Hex | Role |
+|---|---|---|
+| `cream` | `#FDFBD4` | Cards, panels, chrome |
+| `sand` | `#F3EDC5` | Page background, inset areas |
+| `line` | `#DACAA0` | Borders (cream/bark blend) |
+| `bark` | `#713600` | Secondary text, primary buttons |
+| `ember` | `#C05800` | Accents: focus rings, active tab, icons |
+| `cocoa` | `#38240D` | Body text and headings |
+
+Contrast was measured, not assumed. Cocoa is 14.1:1 on cream and bark is 9.1:1,
+both comfortably AA. **Ember is 4.3:1, which passes for large text and non-text UI
+but fails the 4.5:1 threshold for body copy**, so it is confined to focus rings,
+the active tab underline, and icons.
+
+Two additions beyond the four supplied colours: `line` is a blend of cream and
+bark for borders, and one warm red (`#A11B0F`) exists for errors — using ember for
+both warnings and errors would have made them indistinguishable.
+
+The app is **light-only**. The `prefers-color-scheme: dark` block from the Next
+template was removed and `color-scheme: light` is declared, so browser-rendered UI
+is not auto-darkened for visitors whose OS is in dark mode.
 
 ### Good-to-haves included
 
@@ -31,10 +58,31 @@ account, and collaborate through threaded comments.
 - **Semantic PDF search** — a Filename ⇄ Meaning toggle on the dashboard finds
   documents by what they are about, using the same embeddings as chat retrieval.
 - **Email notification on share** via Resend (optional; sharing works without it).
+- **Password reset / account recovery** — see below.
 
-### Not included
+### Password reset
 
-- **Password reset / account recovery.** Cut for time. See *Trade-offs* below.
+`/forgot-password` → emailed link → `/reset-password`. Four properties worth
+noting, all verified against live data:
+
+- **Only a SHA-256 hash of the token is stored**, never the token itself, so read
+  access to the table cannot be turned into account takeover. SHA-256 rather than
+  bcrypt is deliberate: the token is 256 bits of randomness, so there is nothing
+  to brute-force, and lookup must be a deterministic index hit.
+- **The request form always says the same thing** whether or not the address is
+  registered. "No account with that email" would make it an account-enumeration
+  oracle.
+- **Tokens are single-use and expire in 60 minutes.** Completing a reset burns
+  every outstanding token for that user, and requesting a new link retires the
+  previous one.
+- **Unknown, used, and expired tokens produce one identical message**, so the
+  error text never confirms that a token once existed.
+
+If `RESEND_API_KEY` is unset the link is written to the **server log** rather than
+shown in the browser — displaying it in the UI would let anyone reset any account
+by simply asking. To demo this feature you need Resend configured; with the
+sandbox sender (`onboarding@resend.dev`) you can only email the address that owns
+the Resend account.
 
 ---
 
@@ -323,8 +371,10 @@ live stack (`verify-db`, `verify-security`, `probe-storage`, `probe-summary`,
 
 Stated plainly, since the brief asks for transparency.
 
-1. **No password reset flow.** Cut for time; the rest of the auth surface was
-   prioritised.
+1. **A password reset does not revoke existing sessions.** Sessions are JWTs, so
+   invalidating them would mean a database lookup on every request or a
+   `passwordChangedAt` claim check. Someone already holding a stolen session
+   keeps it until the JWT expires.
 2. **No RLS.** Access control is enforced in application code (`lib/authz.ts`)
    rather than by the database. Chosen so password hashing lives in this repo
    and is auditable, and because granting anonymous token-holders row access

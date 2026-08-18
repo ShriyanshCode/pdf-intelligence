@@ -6,7 +6,10 @@
 import { sql } from 'drizzle-orm';
 import { db } from '../lib/db';
 
-const expectedTables = ['users', 'documents', 'chunks', 'shares', 'comments', 'chat_messages'];
+const expectedTables = [
+  'users', 'documents', 'chunks', 'shares', 'comments', 'chat_messages',
+  'password_reset_tokens',
+];
 
 const tableRows = await db.execute<{ table_name: string }>(
   sql`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`,

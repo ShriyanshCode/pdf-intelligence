@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * "Chocolate truffle" palette. Cream is the dominant surface; the browns carry
+ * text and primary actions; the orange is an accent.
+ *
+ * Contrast against cream (#FDFBD4), measured:
+ *   #38240D cocoa  14.1:1  — body text, headings
+ *   #713600 bark    9.1:1  — secondary text, primary buttons
+ *   #C05800 ember   4.3:1  — PASSES for large text and non-text UI only.
+ *                            Never use ember for small body copy; it fails the
+ *                            4.5:1 threshold. It is used for focus rings, active
+ *                            tab underlines, and icons, where 3:1 applies.
+ *
+ * Reverse pairings for buttons:
+ *   cream on bark   9.1:1
+ *   cream on cocoa 14.1:1
+ */
+@theme {
+  /* Surfaces, lightest to deepest */
+  --color-cream: #fdfbd4; /* cards, panels, primary surface */
+  --color-sand: #f3edc5; /* page background, inset areas, muted fills */
+  --color-line: #dacaa0; /* borders and dividers */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Ink and action */
+  --color-bark: #713600;
+  --color-ember: #c05800;
+  --color-cocoa: #38240d;
+
+  /* Accent surface, for the scanned-document notice */
+  --color-ember-surface: #fbe8d2;
+
+  /*
+   * The palette has no red. Destructive and error states need a hue that reads
+   * as "wrong" rather than merely "warm", so one warm red is added deliberately
+   * — using ember for both warnings and errors would make them indistinguishable.
+   */
+  --color-error: #a11b0f;
+  --color-error-surface: #f7e3dc;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+ * Light only. Declaring color-scheme keeps browser-rendered UI — form controls,
+ * scrollbars, the PDF canvas backdrop — from being auto-darkened for visitors
+ * whose OS is set to dark mode.
+ */
+:root {
+  color-scheme: light;
+}
+
+/*
+ * Tailwind v4 changed the default border colour from gray-200 to currentColor,
+ * so a bare `border` would paint in the text colour — near-black cocoa on every
+ * divider. Restore a sane default in the palette.
+ */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-line);
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-sand);
+  color: var(--color-cocoa);
+}
+
+/* Selection picks up the accent rather than the browser default blue. */
+::selection {
+  background: var(--color-ember);
+  color: var(--color-cream);
+}
+
+/*
+ * A single visible focus treatment for keyboard users across every control.
+ * Ember at 3:1 against cream is sufficient for a non-text indicator.
+ */
+:focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 2px;
 }

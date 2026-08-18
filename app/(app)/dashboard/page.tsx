@@ -57,20 +57,20 @@ export default async function DashboardPage({
       <SearchBar />
 
       {q && !searchFailed && (
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-bark">
           {docs.length} result{docs.length === 1 ? '' : 's'} for “{q}”
           {mode === 'meaning' ? ' by meaning' : ' by filename'}
         </p>
       )}
 
       {searchFailed && (
-        <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="rounded-md bg-error-surface px-3 py-2 text-sm text-error">
           Semantic search is unavailable right now. Try filename search instead.
         </p>
       )}
 
       {docs.length === 0 && !searchFailed ? (
-        <p className="rounded-lg border border-dashed p-8 text-center text-sm text-neutral-500">
+        <p className="rounded-lg border border-dashed p-8 text-center text-sm text-bark/80">
           {q
             ? 'Nothing matched. Try the other search mode.'
             : 'No documents yet — upload your first PDF above.'}

@@ -107,14 +107,14 @@ export function DocumentCard({ doc }: { doc: CardDocument }) {
   const isScanned = state.status === 'ready' && state.hasExtractableText === false;
 
   return (
-    <article className="flex flex-col gap-3 rounded-lg border p-4 transition hover:border-neutral-400">
+    <article className="flex flex-col gap-3 rounded-lg border bg-cream p-4 transition hover:border-bark/50">
       <div className="flex items-start gap-3">
-        <FileText className="mt-0.5 size-5 shrink-0 text-neutral-400" aria-hidden />
+        <FileText className="mt-0.5 size-5 shrink-0 text-ember" aria-hidden />
         <div className="min-w-0 flex-1">
           <Link href={`/d/${doc.id}`} className="block truncate font-medium hover:underline">
             {state.filename}
           </Link>
-          <p className="mt-0.5 text-xs text-neutral-500">
+          <p className="mt-0.5 text-xs text-bark/80">
             {formatDate(state.createdAt)} · {formatBytes(state.sizeBytes)}
             {state.pageCount ? ` · ${state.pageCount} pages` : ''}
             {state.shareCount > 0 ? ` · shared with ${state.shareCount}` : ''}
@@ -129,7 +129,7 @@ export function DocumentCard({ doc }: { doc: CardDocument }) {
           <button
             type="submit"
             aria-label={`Delete ${state.filename}`}
-            className="rounded p-1 text-neutral-400 hover:bg-red-50 hover:text-red-700"
+            className="rounded p-1 text-bark/60 hover:bg-error-surface hover:text-error"
           >
             <Trash2 className="size-4" />
           </button>
@@ -137,7 +137,7 @@ export function DocumentCard({ doc }: { doc: CardDocument }) {
       </div>
 
       {state.status === 'failed' ? (
-        <div className="flex items-start gap-2 rounded-md bg-red-50 p-2 text-sm text-red-800">
+        <div className="flex items-start gap-2 rounded-md bg-error-surface p-2 text-sm text-error">
           <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
           <div>
             <p>{state.error ?? 'Processing failed.'}</p>
@@ -153,24 +153,24 @@ export function DocumentCard({ doc }: { doc: CardDocument }) {
           </div>
         </div>
       ) : isScanned ? (
-        <p className="flex items-start gap-2 rounded-md bg-amber-50 p-2 text-sm text-amber-800">
+        <p className="flex items-start gap-2 rounded-md bg-ember-surface p-2 text-sm text-bark">
           <ScanLine className="mt-0.5 size-4 shrink-0" aria-hidden />
           No extractable text — this looks like a scanned document, so summary and chat are unavailable.
         </p>
       ) : TERMINAL.has(state.status) ? (
-        <p className="text-sm leading-relaxed text-neutral-700">{state.summary}</p>
+        <p className="text-sm leading-relaxed text-cocoa">{state.summary}</p>
       ) : (
-        <p className="flex items-center gap-2 text-sm text-neutral-500">
+        <p className="flex items-center gap-2 text-sm text-bark/80">
           <span
             aria-hidden
-            className="size-3 animate-spin rounded-full border-2 border-neutral-300 border-t-neutral-700"
+            className="size-3 animate-spin rounded-full border-2 border-line border-t-ember"
           />
           {STAGE_LABEL[state.status] ?? 'Processing…'}
         </p>
       )}
 
       {state.matchSnippet && (
-        <p className="border-l-2 border-neutral-300 pl-3 text-xs italic text-neutral-600">
+        <p className="border-l-2 border-line pl-3 text-xs italic text-bark">
           …{state.matchSnippet}…
         </p>
       )}
