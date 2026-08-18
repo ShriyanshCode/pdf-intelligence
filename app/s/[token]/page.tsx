@@ -46,9 +46,9 @@ export default async function SharedDocumentPage({
 
   return (
     <div className="flex h-dvh flex-col">
-      <header className="flex shrink-0 items-center justify-between border-b bg-cream px-4 py-3 sm:px-6">
+      <header className="flex shrink-0 items-center justify-between border-b bg-surface px-4 py-3 sm:px-6">
         <span className="font-semibold tracking-tight">PDF Intelligence</span>
-        <span className="truncate text-sm text-bark/80">Shared with {share.inviteeName}</span>
+        <span className="truncate text-sm text-ink/80">Shared with {share.inviteeName}</span>
       </header>
 
       <SummaryBanner

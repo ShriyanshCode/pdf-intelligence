@@ -36,7 +36,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex shrink-0 items-center justify-end border-b bg-cream px-4 py-2 sm:px-6">
+      <div className="flex shrink-0 items-center justify-end border-b bg-surface px-4 py-2 sm:px-6">
         <ShareDialog documentId={doc.id} initialShares={shareRows} />
       </div>
 

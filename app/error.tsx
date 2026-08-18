@@ -10,12 +10,12 @@ export default function Error({ reset }: { error: Error; reset: () => void }) {
     <main className="flex min-h-dvh items-center justify-center p-6 text-center">
       <div>
         <h1 className="text-xl font-semibold">Something went wrong</h1>
-        <p className="mt-2 text-sm text-bark">
+        <p className="mt-2 text-sm text-ink/80">
           The error has been logged. You can try again.
         </p>
         <button
           onClick={reset}
-          className="mt-4 rounded-md bg-bark px-4 py-2 text-sm text-cream"
+          className="mt-4 rounded-full bg-ink px-4 py-2 text-sm text-white"
         >
           Try again
         </button>

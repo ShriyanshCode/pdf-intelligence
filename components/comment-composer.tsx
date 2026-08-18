@@ -53,11 +53,11 @@ export function CommentComposer({
     <form onSubmit={submit} className="space-y-2">
       <div className="flex gap-1" role="group" aria-label="Formatting">
         <button type="button" onClick={() => wrap('**')} aria-label="Bold"
-          className="rounded p-1.5 hover:bg-sand"><Bold className="size-3.5" /></button>
+          className="rounded-full p-1.5 hover:bg-mist"><Bold className="size-3.5" /></button>
         <button type="button" onClick={() => wrap('*')} aria-label="Italic"
-          className="rounded p-1.5 hover:bg-sand"><Italic className="size-3.5" /></button>
+          className="rounded-full p-1.5 hover:bg-mist"><Italic className="size-3.5" /></button>
         <button type="button" onClick={bulletList} aria-label="Bullet list"
-          className="rounded p-1.5 hover:bg-sand"><List className="size-3.5" /></button>
+          className="rounded-full p-1.5 hover:bg-mist"><List className="size-3.5" /></button>
       </div>
 
       <textarea
@@ -68,7 +68,7 @@ export function CommentComposer({
         placeholder={placeholder}
         aria-label={placeholder}
         maxLength={5000}
-        className="w-full resize-none rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-ember"
+        className="w-full resize-none rounded-xl border border-line px-3 py-2 text-sm outline-none focus:border-clay"
       />
 
       {error && <p role="alert" className="text-sm text-error">{error}</p>}
@@ -76,7 +76,7 @@ export function CommentComposer({
       <button
         type="submit"
         disabled={busy || !body.trim()}
-        className="rounded-md bg-bark px-3 py-1.5 text-sm text-cream disabled:opacity-40"
+        className="rounded-full bg-ink px-4 py-2 text-sm text-white transition hover:bg-clay-deep disabled:opacity-40"
       >
         {busy ? 'Posting…' : 'Post'}
       </button>

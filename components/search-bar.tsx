@@ -22,7 +22,7 @@ export function SearchBar() {
     <form onSubmit={submit} className="flex flex-col gap-2 sm:flex-row sm:items-center">
       <div className="relative flex-1">
         <Search
-          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-bark/60"
+          className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-clay"
           aria-hidden
         />
         <input
@@ -32,19 +32,19 @@ export function SearchBar() {
             mode === 'filename' ? 'Search filenames…' : 'Search by what documents are about…'
           }
           aria-label="Search documents"
-          className="w-full rounded-md border border-line py-2 pl-9 pr-3 outline-none focus:border-ember"
+          className="w-full rounded-full border border-line bg-surface py-2.5 pl-10 pr-4 outline-none transition focus:border-clay"
         />
       </div>
 
-      <div className="flex rounded-md border border-line p-0.5 text-sm" role="group" aria-label="Search mode">
+      <div className="flex rounded-full border border-line bg-surface p-1 text-sm" role="group" aria-label="Search mode">
         {(['filename', 'meaning'] as const).map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => setMode(m)}
             aria-pressed={mode === m}
-            className={`rounded px-3 py-1.5 capitalize transition ${
-              mode === m ? 'bg-bark text-cream' : 'text-bark'
+            className={`rounded-full px-3.5 py-1.5 capitalize transition ${
+              mode === m ? 'bg-ink text-white' : 'text-ink/80'
             }`}
           >
             {m}
@@ -54,7 +54,7 @@ export function SearchBar() {
 
       <button
         type="submit"
-        className="rounded-md bg-bark px-4 py-2 text-sm text-cream hover:bg-cocoa"
+        className="rounded-full bg-ink px-5 py-2 text-sm text-white transition hover:bg-clay-deep"
       >
         Search
       </button>

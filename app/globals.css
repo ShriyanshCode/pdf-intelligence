@@ -1,45 +1,47 @@
 @import "tailwindcss";
 
 /*
- * "Chocolate truffle" palette. Cream is the dominant surface; the browns carry
- * text and primary actions; the orange is an accent.
+ * Cool light ground, warm accents.
  *
- * Contrast against cream (#FDFBD4), measured:
- *   #38240D cocoa  14.1:1  — body text, headings
- *   #713600 bark    9.1:1  — secondary text, primary buttons
- *   #C05800 ember   4.3:1  — PASSES for large text and non-text UI only.
- *                            Never use ember for small body copy; it fails the
- *                            4.5:1 threshold. It is used for focus rings, active
- *                            tab underlines, and icons, where 3:1 applies.
+ * Contrast against the canvas (#EBEFEE), measured:
+ *   #4A413C ink        8.6:1  — body text, headings, primary buttons
+ *   #8E5B40 clay-deep  4.9:1  — links and accent text (derived, see below)
+ *   #BB6C43 clay       3.5:1  — FAILS for body copy. Non-text UI and icons only.
+ *   #C8906D tan        2.3:1  — decorative fills only, never text.
  *
- * Reverse pairings for buttons:
- *   cream on bark   9.1:1
- *   cream on cocoa 14.1:1
+ * Reverse pairings:
+ *   white on ink       9.9:1
+ *   white on clay-deep 5.6:1  — used for button hover
+ *   white on clay      4.0:1  — below AA, so clay is not a button background
+ *
+ * Two colours are derived rather than supplied. `clay-deep` exists because
+ * #BB6C43 cannot legally carry link text at 3.5:1; it is that hue mixed toward
+ * ink until it passes. One warm red is added for errors, since the palette has
+ * no hue that reads as "wrong" rather than merely "warm".
  */
 @theme {
-  /* Surfaces, lightest to deepest */
-  --color-cream: #fdfbd4; /* cards, panels, primary surface */
-  --color-sand: #f3edc5; /* page background, inset areas, muted fills */
-  --color-line: #dacaa0; /* borders and dividers */
+  /* Ground and surfaces */
+  --color-canvas: #ebefee; /* page background */
+  --color-surface: #ffffff; /* cards and panels, lifted off the canvas */
+  --color-mist: #dfe5e3; /* inset fills: chat bubbles, PDF backdrop, skeletons */
+  --color-line: #ccb499; /* borders — the palette's sand, warm against cool ground */
 
   /* Ink and action */
-  --color-bark: #713600;
-  --color-ember: #c05800;
-  --color-cocoa: #38240d;
+  --color-ink: #4a413c;
+  --color-clay: #bb6c43;
+  --color-clay-deep: #8e5b40;
+  --color-tan: #c8906d;
+  --color-tan-surface: #f5e6dc;
 
-  /* Accent surface, for the scanned-document notice */
-  --color-ember-surface: #fbe8d2;
-
-  /*
-   * The palette has no red. Destructive and error states need a hue that reads
-   * as "wrong" rather than merely "warm", so one warm red is added deliberately
-   * — using ember for both warnings and errors would make them indistinguishable.
-   */
   --color-error: #a11b0f;
-  --color-error-surface: #f7e3dc;
+  --color-error-surface: #f6e2de;
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Soft, warm-tinted elevation rather than flat grey shadow. */
+  --shadow-card: 0 1px 2px rgb(74 65 60 / 0.05), 0 12px 28px -18px rgb(74 65 60 / 0.35);
+  --shadow-float: 0 8px 40px -12px rgb(74 65 60 / 0.3);
 }
 
 /*
@@ -53,8 +55,7 @@
 
 /*
  * Tailwind v4 changed the default border colour from gray-200 to currentColor,
- * so a bare `border` would paint in the text colour — near-black cocoa on every
- * divider. Restore a sane default in the palette.
+ * so a bare `border` would paint in the text colour. Restore a sane default.
  */
 @layer base {
   *,
@@ -67,21 +68,17 @@
 }
 
 body {
-  background: var(--color-sand);
-  color: var(--color-cocoa);
+  background: var(--color-canvas);
+  color: var(--color-ink);
 }
 
-/* Selection picks up the accent rather than the browser default blue. */
 ::selection {
-  background: var(--color-ember);
-  color: var(--color-cream);
+  background: var(--color-clay);
+  color: #fff;
 }
 
-/*
- * A single visible focus treatment for keyboard users across every control.
- * Ember at 3:1 against cream is sufficient for a non-text indicator.
- */
+/* One visible focus treatment for keyboard users across every control. */
 :focus-visible {
-  outline: 2px solid var(--color-ember);
+  outline: 2px solid var(--color-clay);
   outline-offset: 2px;
 }

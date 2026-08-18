@@ -19,8 +19,8 @@ export const PdfViewer = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full items-center justify-center bg-sand">
-        <p className="text-sm text-bark/80">Loading viewer…</p>
+      <div className="flex h-full items-center justify-center bg-mist">
+        <p className="text-sm text-ink/80">Loading viewer…</p>
       </div>
     ),
   },

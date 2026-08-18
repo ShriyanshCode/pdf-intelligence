@@ -62,19 +62,19 @@ export function ShareDialog({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm hover:bg-sand"
+        className="flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm hover:bg-mist"
       >
         <Share2 className="size-4" aria-hidden /> Share
       </button>
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-cocoa/50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4"
           onClick={() => setOpen(false)}
           role="presentation"
         >
           <div
-            className="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-lg bg-cream p-5 shadow-xl"
+            className="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl bg-surface p-6 shadow-float"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -86,7 +86,7 @@ export function ShareDialog({
                 <X className="size-4" />
               </button>
             </div>
-            <p className="mt-1 text-sm text-bark">
+            <p className="mt-1 text-sm text-ink/80">
               The invitee gets a private link. They do not need an account.
             </p>
 
@@ -94,12 +94,12 @@ export function ShareDialog({
               <input
                 value={name} onChange={(e) => setName(e.target.value)} required maxLength={100}
                 placeholder="Their name" aria-label="Invitee name"
-                className="w-full rounded-md border border-line px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-line px-3 py-2 text-sm"
               />
               <input
                 value={email} onChange={(e) => setEmail(e.target.value)} required type="email"
                 placeholder="their@email.com" aria-label="Invitee email"
-                className="w-full rounded-md border border-line px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-line px-3 py-2 text-sm"
               />
               <label className="flex items-center gap-2 text-sm">
                 <input
@@ -113,14 +113,14 @@ export function ShareDialog({
 
               <button
                 type="submit" disabled={busy}
-                className="w-full rounded-md bg-bark px-4 py-2 text-sm text-cream disabled:opacity-50"
+                className="w-full rounded-full bg-ink px-4 py-2.5 text-sm text-white transition hover:bg-clay-deep disabled:opacity-50"
               >
                 {busy ? 'Creating…' : 'Create link and email it'}
               </button>
             </form>
 
             {lastUrl && (
-              <div className="mt-3 rounded-md bg-sand p-2">
+              <div className="mt-3 rounded-xl bg-mist p-2">
                 <div className="flex items-center gap-2">
                   <input
                     readOnly value={lastUrl} aria-label="Share link"
@@ -132,7 +132,7 @@ export function ShareDialog({
                   </button>
                 </div>
                 {emailed === false && (
-                  <p className="mt-1 text-xs text-bark">
+                  <p className="mt-1 text-xs text-ink/80">
                     Link created. Email was not sent — copy the link and send it yourself.
                   </p>
                 )}
@@ -141,7 +141,7 @@ export function ShareDialog({
 
             {rows.length > 0 && (
               <div className="mt-4 border-t pt-3">
-                <h3 className="text-xs font-medium uppercase tracking-wide text-bark/80">
+                <h3 className="text-xs font-medium uppercase tracking-wide text-ink/80">
                   Shared with
                 </h3>
                 <ul className="mt-2 space-y-2">
@@ -149,7 +149,7 @@ export function ShareDialog({
                     <li key={share.id} className="flex items-center justify-between gap-2 text-sm">
                       <div className="min-w-0">
                         <p className="truncate">{share.inviteeName}</p>
-                        <p className="truncate text-xs text-bark/80">
+                        <p className="truncate text-xs text-ink/80">
                           {share.inviteeEmail}
                           {share.lastViewedAt
                             ? ` · viewed ${formatDate(share.lastViewedAt)}`

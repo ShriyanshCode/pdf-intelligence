@@ -9,8 +9,8 @@ import type { CommentNode, CommentRow } from '@/lib/comments';
 
 function Meta({ comment }: { comment: CommentRow }) {
   return (
-    <p className="text-xs text-bark/80">
-      <span className="font-medium text-cocoa">{comment.authorLabel}</span>
+    <p className="text-xs text-ink/80">
+      <span className="font-medium text-ink">{comment.authorLabel}</span>
       {comment.isOwner ? ' · owner' : ''} · {formatDateTime(comment.createdAt)}
     </p>
   );
@@ -44,7 +44,7 @@ export function CommentsPanel({
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
-        {tree.length === 0 && <p className="text-sm text-bark/80">No comments yet.</p>}
+        {tree.length === 0 && <p className="text-sm text-ink/80">No comments yet.</p>}
 
         {tree.map((comment) => (
           <div key={comment.id} className="space-y-2">
@@ -54,7 +54,7 @@ export function CommentsPanel({
               {canComment && (
                 <button
                   onClick={() => setReplyTo(replyTo === comment.id ? null : comment.id)}
-                  className="mt-1 text-xs text-bark underline"
+                  className="mt-1 text-xs text-ink/80 underline"
                 >
                   {replyTo === comment.id ? 'Cancel' : 'Reply'}
                 </button>
@@ -89,7 +89,7 @@ export function CommentsPanel({
         {canComment ? (
           <CommentComposer onSubmit={(body) => post(body, null)} />
         ) : (
-          <p className="text-sm text-bark/80">This link is read-only.</p>
+          <p className="text-sm text-ink/80">This link is read-only.</p>
         )}
       </div>
     </div>

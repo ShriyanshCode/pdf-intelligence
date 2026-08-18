@@ -80,7 +80,7 @@ export function ChatPanel({
 
   if (!enabled) {
     return (
-      <p className="p-4 text-sm text-bark/80">
+      <p className="p-4 text-sm text-ink/80">
         {disabledReason ?? 'Chat is unavailable for this document.'}
       </p>
     );
@@ -90,8 +90,8 @@ export function ChatPanel({
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
         {messages.length === 0 && (
-          <div className="text-sm text-bark/80">
-            <p className="font-medium text-cocoa">Ask about this document</p>
+          <div className="text-sm text-ink/80">
+            <p className="font-medium text-ink">Ask about this document</p>
             <p className="mt-1">Answers cite page numbers and stay grounded in the text.</p>
           </div>
         )}
@@ -99,8 +99,8 @@ export function ChatPanel({
         {messages.map((m, i) => (
           <div key={i} className={m.role === 'user' ? 'text-right' : ''}>
             <div
-              className={`inline-block max-w-[90%] whitespace-pre-wrap rounded-lg px-3 py-2 text-left text-sm ${
-                m.role === 'user' ? 'bg-bark text-cream' : 'bg-sand text-cocoa'
+              className={`inline-block max-w-[90%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-left text-sm ${
+                m.role === 'user' ? 'bg-ink text-white' : 'bg-mist text-ink'
               }`}
             >
               {m.content || (streaming ? '…' : '')}
@@ -128,13 +128,13 @@ export function ChatPanel({
           rows={2}
           placeholder="Ask a question…"
           aria-label="Ask a question about this document"
-          className="flex-1 resize-none rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-ember"
+          className="flex-1 resize-none rounded-xl border border-line px-3 py-2 text-sm outline-none focus:border-clay"
         />
         <button
           type="submit"
           disabled={streaming || !input.trim()}
           aria-label="Send question"
-          className="rounded-md bg-bark p-2 text-cream disabled:opacity-40"
+          className="rounded-full bg-ink p-2.5 text-white transition hover:bg-clay-deep disabled:opacity-40"
         >
           <SendHorizontal className="size-4" />
         </button>

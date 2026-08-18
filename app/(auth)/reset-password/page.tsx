@@ -15,14 +15,14 @@ export default async function ResetPasswordPage({
   if (!token) {
     return (
       <main className="flex min-h-dvh items-center justify-center p-6">
-        <div className="w-full max-w-sm rounded-xl border border-line bg-cream p-6 text-center shadow-sm">
-          <h1 className="text-xl font-semibold text-cocoa">This link is incomplete</h1>
-          <p className="mt-2 text-sm text-bark">
+        <div className="w-full max-w-sm rounded-3xl border border-line bg-surface p-7 text-center shadow-card">
+          <h1 className="text-xl font-semibold text-ink">This link is incomplete</h1>
+          <p className="mt-2 text-sm text-ink/80">
             Open the link from your email, or request a new one.
           </p>
           <Link
             href="/forgot-password"
-            className="mt-4 inline-block rounded-md bg-bark px-4 py-2 text-sm text-cream hover:bg-cocoa"
+            className="mt-4 inline-block rounded-full bg-ink px-4 py-2 text-sm text-white hover:bg-clay-deep"
           >
             Request a new link
           </Link>

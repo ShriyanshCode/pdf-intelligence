@@ -72,15 +72,15 @@ export function UploadDropzone() {
         role="button"
         tabIndex={0}
         aria-label="Upload a PDF"
-        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 text-center transition ${
-          dragging ? 'border-ember bg-ember-surface' : 'border-line hover:border-bark/50'
+        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-8 text-center transition ${
+          dragging ? 'border-clay bg-tan-surface' : 'border-line hover:border-clay'
         } ${busy ? 'pointer-events-none opacity-60' : ''}`}
       >
-        <UploadCloud className="size-6 text-ember" aria-hidden />
+        <UploadCloud className="size-6 text-clay" aria-hidden />
         <p className="text-sm font-medium">
           {busy ? 'Uploading…' : 'Drop a PDF here, or click to choose'}
         </p>
-        <p className="text-xs text-bark/80">PDF only, up to 25MB</p>
+        <p className="text-xs text-ink/80">PDF only, up to 25MB</p>
         <input
           ref={inputRef}
           type="file"

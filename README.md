@@ -26,26 +26,35 @@ account, and collaborate through threaded comments.
 
 ### Theme
 
-A four-colour palette, cream-dominant, defined once as Tailwind v4 tokens in
+Cool light ground, warm accents. Defined once as Tailwind v4 tokens in
 `app/globals.css`:
 
 | Token | Hex | Role |
 |---|---|---|
-| `cream` | `#FDFBD4` | Cards, panels, chrome |
-| `sand` | `#F3EDC5` | Page background, inset areas |
-| `line` | `#DACAA0` | Borders (cream/bark blend) |
-| `bark` | `#713600` | Secondary text, primary buttons |
-| `ember` | `#C05800` | Accents: focus rings, active tab, icons |
-| `cocoa` | `#38240D` | Body text and headings |
+| `canvas` | `#EBEFEE` | Page background |
+| `surface` | `#FFFFFF` | Cards and panels, lifted off the canvas |
+| `mist` | `#DFE5E3` | Inset fills: chat bubbles, PDF backdrop, skeletons |
+| `line` | `#CCB499` | Borders — warm hairlines against the cool ground |
+| `ink` | `#4A413C` | Body text, headings, primary buttons |
+| `clay` | `#BB6C43` | Accents: focus rings, active tab, icons |
+| `clay-deep` | `#8E5B40` | Links and button hover |
+| `tan` | `#C8906D` | Decorative fills |
 
-Contrast was measured, not assumed. Cocoa is 14.1:1 on cream and bark is 9.1:1,
-both comfortably AA. **Ember is 4.3:1, which passes for large text and non-text UI
-but fails the 4.5:1 threshold for body copy**, so it is confined to focus rings,
-the active tab underline, and icons.
+**Contrast was measured, not assumed, and it changed the design.** Ink is 8.6:1
+on the canvas — comfortably AA. But `clay` is only **3.5:1**, which passes for
+non-text UI and large text yet fails the 4.5:1 body-copy threshold, and white on
+`clay` is **4.0:1** — also short. So clay is never a button background and never
+carries paragraph text; it appears as focus rings, the active tab underline, and
+icons. Buttons are `ink` (white on ink is 9.9:1) hovering to `clay-deep` (5.6:1).
 
-Two additions beyond the four supplied colours: `line` is a blend of cream and
-bark for borders, and one warm red (`#A11B0F`) exists for errors — using ember for
-both warnings and errors would have made them indistinguishable.
+`clay-deep` exists precisely because `clay` cannot legally carry link text: it is
+that hue mixed toward ink until it passes at 4.9:1. One warm red (`#A11B0F`) is
+added for errors, since the palette has no hue that reads as "wrong" rather than
+merely "warm", and white is used for card surfaces.
+
+Modern treatment: pill buttons and inputs, `rounded-2xl`/`rounded-3xl` cards, and
+soft warm-tinted elevation (`--shadow-card`, `--shadow-float`) rather than flat
+grey shadow.
 
 The app is **light-only**. The `prefers-color-scheme: dark` block from the Next
 template was removed and `color-scheme: light` is declared, so browser-rendered UI
