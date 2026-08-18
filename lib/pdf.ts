@@ -22,13 +22,59 @@ export type Chunk = {
   tokenCount: number;
 };
 
+/**
+ * Removes characters Postgres cannot store in a text column.
+ *
+ * pdf.js emits U+0000 for glyphs it cannot map to Unicode — most often the ffi,
+ * fi, and fl ligatures in an embedded font. Postgres rejects NUL outright
+ * (22021: invalid byte sequence for encoding "UTF8": 0x00), which previously
+ * failed an entire ingest *after* extraction had already succeeded: a 142-page
+ * document produced 310 NULs and could not be written.
+ *
+ * Stripping costs a letter or two in affected words — "office" extracts as
+ * "oce" — which is a far better outcome than discarding the document. Lone
+ * surrogates go for the same reason: they are unpaired halves that break
+ * encoding downstream.
+ *
+ * Implemented with char codes rather than a regex so the control-character set
+ * is explicit and cannot be mangled by escaping.
+ */
+export function sanitizeExtractedText(text: string): string {
+  let out = '';
+
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+
+    // Drop NUL and other C0 controls, keeping tab, newline, carriage return.
+    if (code === 0) continue;
+    if (code < 32 && code !== 9 && code !== 10 && code !== 13) continue;
+
+    // High surrogate: keep only if followed by a matching low surrogate.
+    if (code >= 0xd800 && code <= 0xdbff) {
+      const next = text.charCodeAt(i + 1);
+      if (next >= 0xdc00 && next <= 0xdfff) {
+        out += text[i] + text[i + 1];
+        i++;
+      }
+      continue;
+    }
+
+    // Unpaired low surrogate.
+    if (code >= 0xdc00 && code <= 0xdfff) continue;
+
+    out += text[i];
+  }
+
+  return out;
+}
+
 export async function extractPdfText(bytes: Uint8Array) {
   const pdf = await getDocumentProxy(bytes);
   const { totalPages, text } = await extractText(pdf, { mergePages: false });
 
   const pages: PageText[] = (text as string[]).map((t, i) => ({
     page: i + 1,
-    text: (t ?? '').replace(/\r\n/g, '\n').trim(),
+    text: sanitizeExtractedText((t ?? '').replace(/\r\n/g, '\n')).trim(),
   }));
   const fullText = pages.map((p) => p.text).filter(Boolean).join('\n\n');
 

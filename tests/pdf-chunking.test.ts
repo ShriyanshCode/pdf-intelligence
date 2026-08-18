@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  chunkPages, hasUsableText, MAX_CHUNK_TOKENS, TARGET_TOKENS, type PageText,
+  chunkPages, hasUsableText, sanitizeExtractedText, MAX_CHUNK_TOKENS, TARGET_TOKENS, type PageText,
 } from '@/lib/pdf';
 
 /** Builds a page of `paras` paragraphs, each roughly `tokensEach` tokens. */
@@ -89,5 +89,40 @@ describe('hasUsableText', () => {
 
   it('accepts a genuinely tiny one-page document', () => {
     expect(hasUsableText('This is a receipt for $40 paid on 3 March 2026.', 1)).toBe(true);
+  });
+});
+
+describe('sanitizeExtractedText', () => {
+  const NUL = String.fromCharCode(0);
+
+  it('strips the NUL bytes pdf.js emits for unmappable ligature glyphs', () => {
+    // Real case: a 142-page PDF produced 310 NULs and Postgres rejected the write
+    // with 22021 (invalid byte sequence for encoding "UTF8": 0x00).
+    const raw = `The Dean${NUL}s o${NUL}ce`;
+    const clean = sanitizeExtractedText(raw);
+    expect(clean).not.toContain(NUL);
+    expect(clean.charCodeAt(0)).toBe('T'.charCodeAt(0));
+  });
+
+  it('keeps tab, newline, and carriage return', () => {
+    expect(sanitizeExtractedText('a\tb\nc\rd')).toBe('a\tb\nc\rd');
+  });
+
+  it('drops other C0 control characters', () => {
+    const raw = `a${String.fromCharCode(1)}b${String.fromCharCode(31)}c`;
+    expect(sanitizeExtractedText(raw)).toBe('abc');
+  });
+
+  it('preserves valid surrogate pairs such as emoji', () => {
+    expect(sanitizeExtractedText('fee 💰 due')).toBe('fee 💰 due');
+  });
+
+  it('drops lone surrogates, which break encoding downstream', () => {
+    const lone = String.fromCharCode(0xd83d); // high surrogate with no partner
+    expect(sanitizeExtractedText(`a${lone}b`)).toBe('ab');
+  });
+
+  it('leaves ordinary text untouched', () => {
+    expect(sanitizeExtractedText('Ordinary — text, 2026.')).toBe('Ordinary — text, 2026.');
   });
 });

@@ -88,10 +88,15 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   } catch (error) {
     // An AccessError must not mark someone else's document failed.
     if (!(error instanceof AccessError)) {
+      // The raw message is logged, never stored. Drizzle's errors embed the full
+      // SQL plus bound parameters, so storing them put the document's own text
+      // into a field rendered straight into the page.
+      console.error(`ingest failed for document ${id}`, error);
+
       await db.update(documents)
         .set({
           status: 'failed',
-          error: error instanceof Error ? error.message.slice(0, 500) : 'Processing failed',
+          error: 'We could not process this PDF. Retrying may help; if it keeps failing the file may be malformed.',
           updatedAt: new Date(),
         })
         .where(eq(documents.id, id))
